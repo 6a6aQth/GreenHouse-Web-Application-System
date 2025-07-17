@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ShoppingCart, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useQuote } from "../context/QuoteContext"
+import { useRouter } from "next/navigation";
 
 export default function QuoteSummary() {
   const { items, removeFromQuote, clearQuote } = useQuote()
   const [open, setOpen] = useState(false)
-
-  console.log('QuoteSummary items:', items);
+  const router = useRouter();
 
   return (
     <>
@@ -66,7 +66,14 @@ export default function QuoteSummary() {
 
             {items.length > 0 && (
               <div className="p-4 border-t flex gap-2">
-                <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => setOpen(false)}>
+                <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => {
+                  setOpen(false);
+                  // Scroll to contact section
+                  const contactSection = document.getElementById("contact");
+                  if (contactSection) {
+                    contactSection.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}>
                   Continue
                 </Button>
                 <Button variant="outline" className="flex-1 bg-transparent" onClick={clearQuote}>

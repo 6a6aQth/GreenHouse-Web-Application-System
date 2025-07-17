@@ -71,7 +71,9 @@ export default function ProductsServices() {
       name: "NH4",
       description: "Pole spacing 4m, height 3m, without trellising",
       image: "/NH4 Nethouse.webp",
-      specs: [],
+      specs: [
+        "4m pole spacing", "3m height", "No trellising", "UV resistant", "Easy assembly", "Wind resistant", "Durable frame"
+      ],
       price: "Quote on request",
     },
     {
@@ -80,7 +82,9 @@ export default function ProductsServices() {
       name: "NH4T",
       description: "Pole spacing 4m, height 3m, trellising",
       image: "/NH4T Nethouse.jpg",
-      specs: ["4m pole spacing", "3m height", "Trellising"],
+      specs: [
+        "4m pole spacing", "3m height", "Trellising", "High yield", "Pest control", "Easy maintenance", "Long lifespan"
+      ],
       price: "Quote on request",
     },
     // Services
@@ -100,7 +104,9 @@ export default function ProductsServices() {
       name: "Matching Plastic",
       description: "Black and White",
       image: "/Matching Plastic.webp",
-      specs: ["Black & White"],
+      specs: [
+        "Black & White", "UV stabilized", "Tear resistant", "Flexible", "Multi-season", "Custom sizes", "Lightweight"
+      ],
       price: "Quote on request",
     },
     {
@@ -109,7 +115,9 @@ export default function ProductsServices() {
       name: "Greenhouse Covering Plastic",
       description: "9m by 35m roll",
       image: "/GreenHouse Covering Plastic.jpg",
-      specs: ["9m x 35m roll"],
+      specs: [
+        "9m x 35m roll", "UV protection", "High clarity", "Anti-drip", "Long-lasting", "Weatherproof", "Easy install"
+      ],
       price: "Quote on request",
     },
     {
@@ -118,7 +126,9 @@ export default function ProductsServices() {
       name: "Greenhouse Covering Mesh Net",
       description: "50% mesh, 2.5m by 35m roll",
       image: "/greenhouse covering mesh net.webp",
-      specs: ["50% mesh", "2.5m x 35m roll"],
+      specs: [
+        "50% mesh", "2.5m x 35m roll", "Pest barrier", "Breathable", "Light diffusion", "Strong weave", "Reusable"
+      ],
       price: "Quote on request",
     },
     {
@@ -127,7 +137,9 @@ export default function ProductsServices() {
       name: "Shednets",
       description: "40% to 80% shed net",
       image: "/Shednets.jpg",
-      specs: ["40%-80% shade"],
+      specs: [
+        "40%-80% shade", "UV stabilized", "Flexible", "Easy to cut", "Multi-purpose", "Weather resistant", "Affordable"
+      ],
       price: "Quote on request",
     },
     {
@@ -271,7 +283,7 @@ export default function ProductsServices() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 group overflow-hidden">
+                <Card className="h-full flex flex-col hover:shadow-xl transition-all duration-300 group overflow-hidden">
                   <div className="relative overflow-hidden">
                     <img
                       src={product.image || "/placeholder.svg"}
@@ -289,10 +301,10 @@ export default function ProductsServices() {
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 flex flex-col flex-1">
                     <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
 
-                    <div className="space-y-3">
+                    <div className="space-y-3 mb-4">
                       <div className="flex flex-wrap gap-1">
                         {product.specs.map((spec, idx) => (
                           <Badge key={idx} variant="secondary" className="text-xs">
@@ -300,20 +312,18 @@ export default function ProductsServices() {
                           </Badge>
                         ))}
                       </div>
+                    </div>
 
-                      <div className="flex justify-between items-center">
-                        {/* Removed price text */}
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700 px-4 py-1 text-sm rounded"
-                          onClick={() => handleBookNow(product)}
-                        >
-                          Get Quote
-                        </Button>
-                      </div>
+                    <div className="flex-1" />
+                    {/* Centered and roundish Get Quote button always at bottom */}
+                    <div className="flex justify-center gap-2 mt-4">
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 px-6 py-2 text-sm rounded-full"
+                        onClick={() => handleBookNow(product)}
+                      >
+                        Get Quote
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
