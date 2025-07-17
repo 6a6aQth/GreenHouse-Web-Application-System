@@ -10,16 +10,23 @@ export default function QuoteSummary() {
   const { items, removeFromQuote, clearQuote } = useQuote()
   const [open, setOpen] = useState(false)
 
+  console.log('QuoteSummary items:', items);
+
   return (
     <>
       {/* Floating icon */}
       {items.length > 0 && (
         <Button
           variant="outline"
-          className="fixed top-24 right-4 z-40 bg-white border-green-600 text-green-600 hover:bg-green-50 rounded-full h-12 w-12 p-0 flex items-center justify-center shadow-lg"
+          className="fixed bottom-8 right-8 z-50 bg-white border-green-600 text-green-600 hover:bg-green-50 rounded-full h-14 w-14 p-0 flex items-center justify-center shadow-xl transition-all duration-300 ease-in-out animate-bounce-slow"
           onClick={() => setOpen(true)}
         >
-          <ShoppingCart />
+          <ShoppingCart className="w-7 h-7" />
+          {items.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
+              {items.length}
+            </span>
+          )}
         </Button>
       )}
 

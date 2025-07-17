@@ -4,8 +4,15 @@ import { X, Mail } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 export default function NewsletterPopup({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState("")
+  const handleSubscribe = () => {
+    // Optionally, add email validation or submission logic here
+    localStorage.setItem('newsletterPopupDismissed', 'true')
+    onClose()
+  }
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
@@ -33,8 +40,8 @@ export default function NewsletterPopup({ onClose }: { onClose: () => void }) {
         </p>
 
         <div className="flex gap-2">
-          <Input placeholder="Your email" type="email" className="flex-1" />
-          <Button className="bg-green-600 hover:bg-green-700">Subscribe</Button>
+          <Input placeholder="Your email" type="email" className="flex-1" value={email} onChange={e => setEmail(e.target.value)} />
+          <Button className="bg-green-600 hover:bg-green-700" onClick={handleSubscribe}>Subscribe</Button>
         </div>
       </motion.div>
     </motion.div>

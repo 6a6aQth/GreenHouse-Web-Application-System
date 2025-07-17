@@ -1,111 +1,197 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Home, Tent, Shield, Droplets, Wrench, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useQuote } from "../context/QuoteContext"
+// Import ShineBorder from Magic UI
+import { ShineBorder } from "@/components/ui/ShineBorder";
+import { FocusCards } from "@/components/ui/focus-cards";
+import { SparklesCore } from "@/components/ui/sparkles";
 
 export default function ProductsServices() {
   const [activeCategory, setActiveCategory] = useState("all")
   const { addToQuote } = useQuote()
+  const [products, setProducts] = useState<Array<{
+    id: number;
+    category: string;
+    name: string;
+    description: string;
+    image: string;
+    specs: string[];
+    price: string;
+  }>>([]);
 
   const categories = [
     { id: "all", name: "All Products", icon: Package },
     { id: "greenhouses", name: "Greenhouses", icon: Home },
     { id: "tunnels", name: "Tunnels", icon: Tent },
-    { id: "nethouses", name: "Nethouses", icon: Shield },
+    { id: "nethouses", name: "Nethouse", icon: Shield },
     { id: "irrigation", name: "Irrigation", icon: Droplets },
     { id: "accessories", name: "Accessories", icon: Wrench },
   ]
 
-  const products = [
+  // New products/services data
+  const defaultProducts = [
+    // Greenhouses/Tunnels
     {
       id: 1,
-      category: "greenhouses",
-      name: "TG8 Fixed Vent Greenhouse",
-      description: "8m span, 7m height, 2-4m arch spacing, 25kg/sqm load capacity",
-      image:
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["8m span", "7m height", "25kg/sqm load"],
+      category: "tunnels",
+      name: "TTV8 Fixed Vent",
+      description: "High tunnel up to 3.5m, span 8m, distance between arch 2m or 3m, minimum length 8m, vent 1.15m, loading capacity 25kg/sqm",
+      image: "/TTV8 Fixed Vent Tunnel.jpg",
+      specs: ["3.5m high", "8m span", "2m/3m arch", "8m+ length", "1.15m vent", "25kg/sqm"],
       price: "Quote on request",
     },
     {
       id: 2,
-      category: "greenhouses",
-      name: "TG10 Fixed Vent Greenhouse",
-      description: "10m span greenhouse with same specifications as TG8",
-      image:
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["10m span", "7m height", "25kg/sqm load"],
+      category: "tunnels",
+      name: "TT8",
+      description: "High tunnel up to 3.5m, span 8m, distance between arch 2m or 3m, minimum length 8m, vent 1.15m, loading capacity 25kg/sqm",
+      image: "/TT8 Tunnel.jpg",
+      specs: ["3.5m high", "8m span", "2m/3m arch", "8m+ length", "1.15m vent", "25kg/sqm"],
       price: "Quote on request",
     },
     {
       id: 3,
       category: "tunnels",
-      name: "TTV8 Fixed Vent Tunnel",
-      description: "10m span, 3.5m high, 25kg/sqm load, 115cm vent height",
-      image:
-        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["10m span", "3.5m height", "115cm vent"],
+      name: "TT10",
+      description: "High tunnel up to 3.5m, span 10m, distance between arch 2m or 3m, minimum length, loading capacity 25kg/sqm",
+      image: "/TT10  Tunnel.jpg",
+      specs: ["3.5m high", "10m span", "2m/3m arch", "25kg/sqm"],
       price: "Quote on request",
     },
+    // Nethouse
     {
       id: 4,
-      category: "tunnels",
-      name: "TT8 & TT10 Tunnels",
-      description: "Up to 35m length, 2-3m arch spacing options",
-      image:
-        "https://images.unsplash.com/photo-1592419044706-39796d40f98c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["Up to 35m length", "2-3m arch spacing"],
+      category: "nethouses",
+      name: "NH4",
+      description: "Pole spacing 4m, height 3m, without trellising",
+      image: "/NH4 Nethouse.webp",
+      specs: [],
       price: "Quote on request",
     },
     {
       id: 5,
       category: "nethouses",
-      name: "NH4 Nethouse",
-      description: "4m pole spacing, 3m height, with/without trellising options",
-      image:
-        "https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["4m pole spacing", "3m height", "Trellising optional"],
+      name: "NH4T",
+      description: "Pole spacing 4m, height 3m, trellising",
+      image: "/NH4T Nethouse.jpg",
+      specs: ["4m pole spacing", "3m height", "Trellising"],
       price: "Quote on request",
     },
+    // Services
     {
       id: 6,
-      category: "accessories",
-      name: "Shade Nets",
-      description: "Available in 40%, 50%, 60%, 75%, 80% shade options",
-      image:
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["Multiple shade %", "Various sizes"],
+      category: "irrigation",
+      name: "Irrigation",
+      description: "Design, supply and installation of irrigation systems ranging from manual to fully automatic systems. Includes drip systems, filters, dosing equipment",
+      image: "/Irrigation.jpg",
+      specs: ["Manual/Automatic", "Drip systems", "Filters", "Dosing equipment"],
       price: "Quote on request",
     },
+    // Accessories (for filter: Accessories)
     {
       id: 7,
-      category: "irrigation",
-      name: "Drip Irrigation Systems",
-      description: "Manual & automatic systems with filters & dosing equipment",
-      image:
-        "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["Manual/Automatic", "Filters included", "Dosing equipment"],
+      category: "accessories",
+      name: "Matching Plastic",
+      description: "Black and White",
+      image: "/Matching Plastic.webp",
+      specs: ["Black & White"],
       price: "Quote on request",
     },
     {
       id: 8,
       category: "accessories",
-      name: "Crop Support Kit",
-      description: "Clips, hooks, trellising twine, cluster kits, truss arches",
-      image:
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      specs: ["Complete kit", "Various accessories"],
+      name: "Greenhouse Covering Plastic",
+      description: "9m by 35m roll",
+      image: "/GreenHouse Covering Plastic.jpg",
+      specs: ["9m x 35m roll"],
+      price: "Quote on request",
+    },
+    {
+      id: 9,
+      category: "accessories",
+      name: "Greenhouse Covering Mesh Net",
+      description: "50% mesh, 2.5m by 35m roll",
+      image: "/greenhouse covering mesh net.webp",
+      specs: ["50% mesh", "2.5m x 35m roll"],
+      price: "Quote on request",
+    },
+    {
+      id: 10,
+      category: "accessories",
+      name: "Shednets",
+      description: "40% to 80% shed net",
+      image: "/Shednets.jpg",
+      specs: ["40%-80% shade"],
+      price: "Quote on request",
+    },
+    {
+      id: 11,
+      category: "accessories",
+      name: "Crop Support",
+      description: "Supply of crop support systems including clips, hooks, twine, truss arches, cluster support",
+      image: "/Crop Support.jpg",
+      specs: ["Clips", "Hooks", "Twine", "Truss arches", "Cluster support"],
+      price: "Quote on request",
+    },
+    // Greenhouses
+    {
+      id: 12,
+      category: "greenhouses",
+      name: "TG8 Fixed Vent Greenhouse",
+      description: "8m span, 7m height, 2-4m arch spacing, 25kg/sqm load capacity",
+      image: "/TG8 Fixed Vent Greenhouse.jpg",
+      specs: ["8m span", "7m height", "2-4m arch", "25kg/sqm load"],
+      price: "Quote on request",
+    },
+    {
+      id: 13,
+      category: "greenhouses",
+      name: "TG10 Fixed Vent Greenhouse",
+      description: "10m span greenhouse with same specifications as TG8",
+      image: "/TG10 Fixed Vent Greenhouse.webp",
+      specs: ["10m span", "7m height", "2-4m arch", "25kg/sqm load"],
       price: "Quote on request",
     },
   ]
 
-  const filteredProducts =
-    activeCategory === "all" ? products : products.filter((product) => product.category === activeCategory)
+  // Load from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("products")
+    if (stored) {
+      setProducts(JSON.parse(stored))
+    } else {
+      setProducts(defaultProducts)
+      localStorage.setItem("products", JSON.stringify(defaultProducts))
+    }
+  }, [])
+
+  // Save to localStorage when products change
+  useEffect(() => {
+    if (products.length > 0) {
+      localStorage.setItem("products", JSON.stringify(products))
+    }
+  }, [products])
+
+  // Filter logic
+  let filteredProducts = products
+  if (activeCategory === "accessories") {
+    // Only show the 5 accessories
+    filteredProducts = products.filter((p) => [
+      "Matching Plastic",
+      "Greenhouse Covering Plastic",
+      "Greenhouse Covering Mesh Net",
+      "Shednets",
+      "Crop Support"
+    ].includes(p.name))
+  } else if (activeCategory !== "all") {
+    filteredProducts = products.filter((product) => product.category === activeCategory)
+  }
 
   const handleBookNow = (product: (typeof products)[0]) => {
     addToQuote({
@@ -126,7 +212,18 @@ export default function ProductsServices() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">Products & Services</h2>
+          <div className="relative inline-block">
+            <h2 className="text-4xl md:text-5xl font-bold text-green-700 mb-6">Products & Services</h2>
+            <SparklesCore
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              particleColor="#22c55e"
+              particleDensity={80}
+              minSize={1}
+              maxSize={3}
+              speed={3}
+              background="transparent"
+            />
+          </div>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Comprehensive agricultural solutions for modern farming
           </p>
@@ -205,19 +302,16 @@ export default function ProductsServices() {
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <span className="font-semibold text-green-600">{product.price}</span>
+                        {/* Removed price text */}
                       </div>
 
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          className="bg-green-600 hover:bg-green-700 px-4 py-1 text-sm rounded"
                           onClick={() => handleBookNow(product)}
                         >
-                          Book Now
-                        </Button>
-                        <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                          View Details
+                          Get Quote
                         </Button>
                       </div>
                     </div>
@@ -234,36 +328,36 @@ export default function ProductsServices() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true }}
-          className="mt-20 text-center"
+          className="mt-20"
         >
-          <h3 className="text-3xl font-bold text-slate-800 mb-8">Additional Services</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Farm Design Consulting",
-                description: "Professional farm layout and design services",
-                icon: "🏗️",
-              },
-              {
-                title: "Greenhouse Loan Support",
-                description: "Assistance with financing your greenhouse project",
-                icon: "💰",
-              },
-              {
-                title: "Business Advisory",
-                description: "Strategic guidance for agricultural businesses",
-                icon: "📊",
-              },
-            ].map((service, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-0">
-                  <div className="text-4xl mb-4">{service.icon}</div>
-                  <h4 className="text-xl font-bold text-slate-800 mb-3">{service.title}</h4>
-                  <p className="text-slate-600">{service.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="relative mb-10 flex justify-center items-center">
+            <span className="relative z-10 text-3xl md:text-4xl font-bold text-green-700 text-center">Additional Services</span>
+            <SparklesCore
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              particleColor="#22c55e"
+              particleDensity={80}
+              minSize={1}
+              maxSize={3}
+              speed={3}
+              background="transparent"
+            />
           </div>
+          <FocusCards
+            cards={[
+              {
+                title: "Greenhouse Technology",
+                src: "/01.png",
+              },
+              {
+                title: "Partition Visual",
+                src: "/02.png",
+              },
+              {
+                title: "Modern Greenhouse",
+                src: "/03.png",
+              },
+            ]}
+          />
         </motion.div>
       </div>
     </section>

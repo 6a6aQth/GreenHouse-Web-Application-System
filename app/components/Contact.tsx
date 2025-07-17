@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import { SparklesCore } from "@/components/ui/sparkles";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -81,7 +82,18 @@ export default function Contact() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">Get In Touch</h2>
+          <div className="relative inline-block">
+            <h2 className="text-4xl md:text-5xl font-bold text-green-700 mb-6">Get In Touch</h2>
+            <SparklesCore
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              particleColor="#22c55e"
+              particleDensity={80}
+              minSize={1}
+              maxSize={3}
+              speed={3}
+              background="transparent"
+            />
+          </div>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Ready to transform your farming? Contact us for consultation and quotes
           </p>

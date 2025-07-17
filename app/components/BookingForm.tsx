@@ -37,16 +37,7 @@ export default function BookingForm() {
 
   return (
     <>
-      {/* trigger button – you can move/ style this differently */}
-      {items.length > 0 && (
-        <Button
-          className="fixed bottom-6 right-6 z-50 bg-green-600 hover:bg-green-700 rounded-full shadow-lg"
-          onClick={() => setOpen(true)}
-        >
-          Book / Quote ({items.length})
-        </Button>
-      )}
-
+      {/* trigger button removed */}
       <AnimatePresence>
         {shouldShow && (
           <motion.div

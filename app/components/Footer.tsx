@@ -39,7 +39,7 @@ export default function Footer() {
               className="lg:col-span-1"
             >
               <Image
-                src="/logo.png"
+                src="/Logo2.png"
                 alt="Smart Agri Solutions"
                 width={180}
                 height={40}
@@ -162,4 +162,8 @@ export default function Footer() {
               </a>
             </div>
           </div>
-        </motion.div\
+        </motion.div>
+      </div>
+    </footer>
+  )
+}

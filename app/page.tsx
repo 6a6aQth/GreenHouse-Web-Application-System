@@ -7,7 +7,6 @@ import Hero from "./components/Hero"
 import About from "./components/About"
 import ProductsServices from "./components/ProductsServices"
 import BookingForm from "./components/BookingForm"
-import Learn from "./components/Learn"
 import Testimonials from "./components/Testimonials"
 import Contact from "./components/Contact"
 import Footer from "./components/Footer"
@@ -19,12 +18,16 @@ export default function Home() {
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false)
 
   useEffect(() => {
+    // Helper to check dismissal
+    const isDismissed = () => localStorage.getItem('newsletterPopupDismissed') === 'true'
+    if (isDismissed()) return
+
     const timer = setTimeout(() => {
-      setShowNewsletterPopup(true)
-    }, 30000) // Show after 30 seconds
+      if (!isDismissed()) setShowNewsletterPopup(true)
+    }, 30000)
 
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) {
+      if (!isDismissed() && window.scrollY > window.innerHeight * 0.8) {
         setShowNewsletterPopup(true)
       }
     }
@@ -37,22 +40,26 @@ export default function Home() {
     }
   }, [])
 
+  const handleCloseNewsletterPopup = () => {
+    setShowNewsletterPopup(false)
+    localStorage.setItem('newsletterPopupDismissed', 'true')
+  }
+
   return (
     <QuoteProvider>
       <div className="min-h-screen bg-white">
         <Navbar />
         <main>
           <Hero />
-          <About />
           <ProductsServices />
-          <Learn />
+          <About />
           <Testimonials />
           <Contact />
         </main>
         <Footer />
 
         <AnimatePresence>
-          {showNewsletterPopup && <NewsletterPopup onClose={() => setShowNewsletterPopup(false)} />}
+          {showNewsletterPopup && <NewsletterPopup onClose={handleCloseNewsletterPopup} />}
         </AnimatePresence>
 
         <QuoteSummary />
