@@ -39,8 +39,8 @@ export default function BookingForm({ open, setOpen }: { open: boolean, setOpen:
       email: form.email,
       first_name: form.name.split(" ")[0] || form.name,
       last_name: form.name.split(" ").slice(1).join(" ") || "-",
-      callback_url: "https://greenhouse.midascreed.com/api/paychangu-callback",
-      return_url: "https://greenhouse.midascreed.com/?quote=success",
+      callback_url: "https://greenhouse.midascreed.com/quote/verifying",
+      return_url: "https://greenhouse.midascreed.com/quote/status",
       tx_ref,
       customization: {
         title: "Quotation Fee",
