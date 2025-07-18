@@ -6,10 +6,12 @@ import { ShoppingCart, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useQuote } from "../context/QuoteContext"
 import { useRouter } from "next/navigation";
+import BookingForm from "./BookingForm";
 
 export default function QuoteSummary() {
   const { items, removeFromQuote, clearQuote } = useQuote()
   const [open, setOpen] = useState(false)
+  const [showForm, setShowForm] = useState(false);
   const router = useRouter();
 
   return (
@@ -68,11 +70,7 @@ export default function QuoteSummary() {
               <div className="p-4 border-t flex gap-2">
                 <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => {
                   setOpen(false);
-                  // Scroll to contact section
-                  const contactSection = document.getElementById("contact");
-                  if (contactSection) {
-                    contactSection.scrollIntoView({ behavior: "smooth" });
-                  }
+                  setShowForm(true);
                 }}>
                   Continue
                 </Button>
@@ -84,6 +82,7 @@ export default function QuoteSummary() {
           </motion.aside>
         )}
       </AnimatePresence>
+      <BookingForm open={showForm} setOpen={setShowForm} />
     </>
   )
 }
