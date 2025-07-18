@@ -1,3 +1,4 @@
+"use client";
 export default function QuoteStatus() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-lg text-red-600">
