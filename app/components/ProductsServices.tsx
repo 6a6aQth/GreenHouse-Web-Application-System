@@ -167,18 +167,18 @@ export default function ProductsServices() {
                           </Badge>
                         ))}
                       </div>
-                    </div>
+                      </div>
 
                     <div className="flex-1" />
                     {/* Centered and roundish Get Quote button always at bottom */}
                     <div className="flex justify-center gap-2 mt-4">
-                      <Button
-                        size="sm"
+                        <Button
+                          size="sm"
                         className="bg-green-600 hover:bg-green-700 px-6 py-2 text-sm rounded-full"
-                        onClick={() => handleBookNow(product)}
-                      >
+                          onClick={() => handleBookNow(product)}
+                        >
                         Get Quote
-                      </Button>
+                        </Button>
                     </div>
                   </CardContent>
                 </Card>

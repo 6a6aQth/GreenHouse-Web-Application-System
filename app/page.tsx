@@ -13,9 +13,13 @@ import Footer from "./components/Footer"
 import NewsletterPopup from "./components/NewsletterPopup"
 import QuoteSummary from "./components/QuoteSummary"
 import { QuoteProvider } from "./context/QuoteContext"
+import { useSearchParams } from "next/navigation"
 
 export default function Home() {
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false)
+  const [showQuoteBanner, setShowQuoteBanner] = useState(false)
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Helper to check dismissal
@@ -40,6 +44,14 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (searchParams.get("quote") === "success") {
+      setShowQuoteBanner(true);
+      const timer = setTimeout(() => setShowQuoteBanner(false), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
   const handleCloseNewsletterPopup = () => {
     setShowNewsletterPopup(false)
     localStorage.setItem('newsletterPopupDismissed', 'true')
@@ -48,6 +60,12 @@ export default function Home() {
   return (
     <QuoteProvider>
       <div className="min-h-screen bg-white">
+        {showQuoteBanner && (
+          <div className="w-full bg-green-600 text-white text-center py-3 font-semibold shadow-md z-50">
+            Your quote request was submitted successfully! We will contact you soon.
+            <button className="ml-4 underline" onClick={() => setShowQuoteBanner(false)}>Dismiss</button>
+          </div>
+        )}
         <Navbar />
         <main>
           <Hero />
@@ -63,7 +81,7 @@ export default function Home() {
         </AnimatePresence>
 
         <QuoteSummary />
-        <BookingForm />
+        <BookingForm open={bookingOpen} setOpen={setBookingOpen} />
       </div>
     </QuoteProvider>
   )

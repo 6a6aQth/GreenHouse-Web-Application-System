@@ -40,7 +40,7 @@ export default function BookingForm({ open, setOpen }: { open: boolean, setOpen:
       first_name: form.name.split(" ")[0] || form.name,
       last_name: form.name.split(" ").slice(1).join(" ") || "-",
       callback_url: "https://greenhouse.midascreed.com/api/paychangu-callback",
-      return_url: "https://greenhouse.midascreed.com/quote-cancelled",
+      return_url: "https://greenhouse.midascreed.com/?quote=success",
       tx_ref,
       customization: {
         title: "Quotation Fee",
