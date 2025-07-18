@@ -13,14 +13,12 @@ import Footer from "./components/Footer"
 import NewsletterPopup from "./components/NewsletterPopup"
 import QuoteSummary from "./components/QuoteSummary"
 import { QuoteProvider } from "./context/QuoteContext"
-import { useSearchParams } from "next/navigation"
 import { Suspense } from "react";
 import QuoteBannerWithParams from "./components/QuoteBannerWithParams";
 
 export default function Home() {
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false)
   const [bookingOpen, setBookingOpen] = useState(false);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Helper to check dismissal
