@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Call PayChangu verify endpoint
-    const verifyRes = await fetch(`https://api.paychangu.com/transaction/verify/${tx_ref}`, {
+    // Call PayChangu verify endpoint (corrected)
+    const verifyRes = await fetch(`https://api.paychangu.com/transaction/verify?tx_ref=${tx_ref}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
