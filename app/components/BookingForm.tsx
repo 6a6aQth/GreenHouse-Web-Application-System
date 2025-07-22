@@ -28,20 +28,15 @@ export default function BookingForm({ open, setOpen }: { open: boolean, setOpen:
   const handleNext = () => setStep((s) => s + 1)
   const handleBack = () => setStep((s) => s - 1)
 
-  // PayChangu Standard Checkout integration
-  const payChanguCheckout = async () => {
-    // Example: Calculate total fee (for demo, use 1000 MWK per item)
+  // New PayChangu Standard Checkout integration
+  const initiatePayment = async () => {
     const amount = items.length * 1000;
-    const tx_ref = `rqf-${Date.now()}-${Math.floor(Math.random()*10000)}`;
     const payload = {
       amount,
       currency: "MWK",
       email: form.email,
       first_name: form.name.split(" ")[0] || form.name,
       last_name: form.name.split(" ").slice(1).join(" ") || "-",
-      callback_url: "https://greenhouse.midascreed.com/quote/verifying",
-      return_url: "https://greenhouse.midascreed.com/quote/status",
-      tx_ref,
       customization: {
         title: "Quotation Fee",
         description: `Quote for: ${items.map(i => i.name).join(", ")}`,
@@ -50,58 +45,29 @@ export default function BookingForm({ open, setOpen }: { open: boolean, setOpen:
         phone: form.phone,
         region: form.region,
         notes: form.notes,
-        items: items.map(i => i.name).join(", ")
+        items: items.map(i => ({ productId: i.id, name: i.name, quantity: 1 }))
       }
     };
     try {
-      const res = await fetch("/api/paychangu-initiate", {
+      const res = await fetch("/api/initiate-payment", {
         method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        },
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (data?.data?.checkout_url) {
-        window.location.href = data.data.checkout_url;
+      if (data?.checkout_url) {
+        window.location.href = data.checkout_url;
       } else {
-        toast({ title: "Payment Error", description: data.message || "Could not initiate payment." });
+        toast({ title: "Payment Error", description: data.error || "Could not initiate payment." });
       }
     } catch (err) {
       toast({ title: "Payment Error", description: "Could not connect to payment gateway." });
-    }
-  }
-
-  const submitQuoteRequest = async () => {
-    try {
-      const res = await fetch("/api/quote-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userName: form.name,
-          userEmail: form.email,
-          userPhone: form.phone,
-          items: items.map((it) => ({ productId: Number(it.id), quantity: 1 })),
-        }),
-      });
-      if (res.ok) {
-        toast({ title: "Quote Request Submitted!", description: "We have received your request and will respond soon." });
-        clearQuote();
-        setOpen(false);
-        setStep(1);
-      } else {
-        toast({ title: "Submission Error", description: "Failed to submit quote request." });
-      }
-    } catch (err) {
-      toast({ title: "Submission Error", description: "Could not connect to server." });
     }
   };
 
   const submit = async () => {
     setLoading(true);
-    await payChanguCheckout();
-    await submitQuoteRequest();
+    await initiatePayment();
     setLoading(false);
   }
 
