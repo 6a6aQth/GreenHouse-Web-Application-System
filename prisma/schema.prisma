@@ -46,3 +46,13 @@ model QuoteItem {
   adminPrice     Decimal?     // Set by admin after review
   notes          String?
 }
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  tx_ref    String   @unique
+  status    String
+  amount    Decimal
+  currency  String
+  email     String?
+  createdAt DateTime @default(now())
+}
