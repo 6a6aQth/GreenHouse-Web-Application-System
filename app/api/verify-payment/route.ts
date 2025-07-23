@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Call PayChangu verify endpoint
-    const verifyRes = await fetch(`https://api.paychangu.com/payment/verify?tx_ref=${tx_ref}`, {
+    // Call PayChangu verify endpoint (correct endpoint)
+    const verifyRes = await fetch(`https://api.paychangu.com/verify-payment/${tx_ref}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -30,8 +30,7 @@ export async function GET(req: NextRequest) {
     console.log('PayChangu verify response:', JSON.stringify(data, null, 2));
 
     // Check for success status (adjust if needed based on real response)
-    const status = data?.data?.status;
-    if (status === 'success' || status === 'successful') {
+    if (data.status === 'success' && data.data && data.data.status === 'success') {
       // Upsert transaction
       const txData = data.data;
       await prisma.transaction.upsert({
@@ -40,14 +39,14 @@ export async function GET(req: NextRequest) {
           status: txData.status,
           amount: txData.amount ? Number(txData.amount) : 0,
           currency: txData.currency || '',
-          email: txData.email || null,
+          email: txData.customer?.email || null,
         },
         create: {
           tx_ref,
           status: txData.status,
           amount: txData.amount ? Number(txData.amount) : 0,
           currency: txData.currency || '',
-          email: txData.email || null,
+          email: txData.customer?.email || null,
         },
       });
       return NextResponse.json({ success: true, data });
@@ -56,6 +55,6 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     console.error('Error verifying payment:', err);
-    return NextResponse.json({ success: false, error: 'Verification failed' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Verification failed', details: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 } 
