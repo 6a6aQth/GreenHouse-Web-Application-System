@@ -34,6 +34,9 @@ model QuoteRequest {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   quoteItems QuoteItem[]
+  tx_ref     String?
+
+  @@index([tx_ref])
 }
 
 model QuoteItem {

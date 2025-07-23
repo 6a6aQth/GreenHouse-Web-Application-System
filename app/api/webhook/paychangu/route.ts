@@ -69,6 +69,31 @@ export async function POST(req: NextRequest) {
           },
         });
         console.log('Transaction upserted successfully for tx_ref:', tx_ref);
+        // Create QuoteRequest if meta is present and not already created
+        const meta = txData.meta;
+        if (meta && meta.userName && meta.userEmail && meta.phone && Array.isArray(meta.items)) {
+          const existingQuote = await prisma.quoteRequest.findFirst({ where: { tx_ref } });
+          if (!existingQuote) {
+            await prisma.quoteRequest.create({
+              data: {
+                userName: meta.userName,
+                userEmail: meta.userEmail,
+                userPhone: meta.phone,
+                tx_ref,
+                quoteItems: {
+                  create: meta.items.map((item: any) => ({
+                    productId: Number(item.productId),
+                    quantity: item.quantity || 1,
+                    notes: item.notes || null,
+                  })),
+                },
+              },
+            });
+            console.log('QuoteRequest created for tx_ref:', tx_ref);
+          } else {
+            console.log('QuoteRequest already exists for tx_ref:', tx_ref);
+          }
+        }
       } catch (dbErr) {
         console.error('Error upserting transaction in DB:', dbErr);
         return NextResponse.json({ error: 'DB error', details: dbErr instanceof Error ? dbErr.message : String(dbErr) }, { status: 500 });

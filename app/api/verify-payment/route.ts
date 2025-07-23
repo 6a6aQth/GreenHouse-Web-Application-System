@@ -49,6 +49,31 @@ export async function GET(req: NextRequest) {
           email: txData.customer?.email || null,
         },
       });
+      // Create QuoteRequest if meta is present and not already created
+      const meta = txData.meta;
+      if (meta && meta.userName && meta.userEmail && meta.phone && Array.isArray(meta.items)) {
+        const existingQuote = await prisma.quoteRequest.findFirst({ where: { tx_ref } });
+        if (!existingQuote) {
+          await prisma.quoteRequest.create({
+            data: {
+              userName: meta.userName,
+              userEmail: meta.userEmail,
+              userPhone: meta.phone,
+              tx_ref,
+              quoteItems: {
+                create: meta.items.map((item: any) => ({
+                  productId: Number(item.productId),
+                  quantity: item.quantity || 1,
+                  notes: item.notes || null,
+                })),
+              },
+            },
+          });
+          console.log('QuoteRequest created for tx_ref:', tx_ref);
+        } else {
+          console.log('QuoteRequest already exists for tx_ref:', tx_ref);
+        }
+      }
       return NextResponse.json({ success: true, data });
     } else {
       return NextResponse.json({ success: false, data });
