@@ -35,6 +35,7 @@ model QuoteRequest {
   updatedAt  DateTime    @updatedAt
   quoteItems QuoteItem[]
   tx_ref     String?
+  adminNotes String?
 
   @@index([tx_ref])
 }
