@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
       drawText('Product           Qty   Price   Notes', 12, rgb(0,0,0), 60);
       y -= 2;
       // Items
-      quote.quoteItems.forEach(item => {
+      quote.quoteItems.forEach((item: any) => {
         drawText(`${item.product?.name || 'Unknown'}        ${item.quantity}    ${item.adminPrice ?? '-'}    ${item.notes ?? ''}`, 12, rgb(0,0,0), 60);
       });
       y -= 10;
@@ -170,11 +170,7 @@ export async function GET(req: NextRequest) {
   try {
     const quoteRequests = await prisma.quoteRequest.findMany({
       orderBy: { createdAt: 'desc' },
-      include: {
-        quoteItems: {
-          include: { product: true }
-        }
-      }
+      include: { quoteItems: { include: { product: true } } },
     })
     return NextResponse.json(quoteRequests)
   } catch (error) {

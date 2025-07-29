@@ -80,10 +80,10 @@ export default function AdminPage() {
       if (res.ok) {
         alert('Email sent successfully!');
       } else {
-        alert('Failed to send email: ' + (data.error || 'Unknown error'));
+        alert('Failed to send email: ' + (data.details || data.error || 'Unknown error'));
       }
     } catch (err) {
-      alert('Failed to send email');
+      alert('Failed to send email: ' + (err instanceof Error ? err.message : String(err)));
     }
   };
 
