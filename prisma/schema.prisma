@@ -44,7 +44,7 @@ model QuoteItem {
   id             Int          @id @default(autoincrement())
   product        Product      @relation(fields: [productId], references: [id])
   productId      Int
-  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id])
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
   quoteRequestId Int
   quantity       Int          @default(1)
   adminPrice     Decimal?     // Set by admin after review
