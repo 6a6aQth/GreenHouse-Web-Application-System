@@ -326,6 +326,7 @@ export async function POST(req: NextRequest) {
           create: items.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity || 1,
+            adminPrice: item.adminPrice !== undefined ? item.adminPrice : undefined,
             notes: item.notes || null,
           })),
         },
@@ -378,26 +379,51 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, items, adminNotes, status } = body;
-    if (!id || !Array.isArray(items)) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const { id, userName, userEmail, userPhone, adminNotes, status, items, notes } = body;
+    if (!id) {
+      return NextResponse.json({ error: 'Missing quote request ID' }, { status: 400 });
     }
-    // Update quoteRequest
-    const updated = await prisma.quoteRequest.update({
-      where: { id },
-      data: {
-        adminNotes: adminNotes || undefined,
-        status: status || undefined,
-        quoteItems: {
-          update: items.map((item: any) => ({
+
+    const updateData: any = {};
+    if (userName !== undefined) updateData.userName = userName;
+    if (userEmail !== undefined) updateData.userEmail = userEmail;
+    if (userPhone !== undefined) updateData.userPhone = userPhone;
+    if (notes !== undefined) updateData.notes = notes; // Update the main quote request notes
+    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+    if (status !== undefined) updateData.status = status;
+
+    if (items !== undefined && Array.isArray(items)) {
+      const itemsToUpdate = items.filter((item: any) => item.id !== undefined);
+      const itemsToCreate = items.filter((item: any) => item.id === undefined);
+
+      if (itemsToUpdate.length > 0) {
+        updateData.quoteItems = {
+          update: itemsToUpdate.map((item: any) => ({
             where: { id: item.id },
             data: {
-              adminPrice: item.adminPrice !== undefined ? String(item.adminPrice) : undefined,
+              quantity: item.quantity !== undefined ? item.quantity : undefined,
+              adminPrice: item.adminPrice !== undefined ? item.adminPrice : undefined,
               notes: item.notes || undefined,
             },
           })),
-        },
-      },
+        };
+      }
+
+      if (itemsToCreate.length > 0) {
+        updateData.quoteItems = {
+          ...(updateData.quoteItems || {}), // Merge with existing update if it exists
+          create: itemsToCreate.map((item: any) => ({
+            productId: item.productId,
+            quantity: item.quantity || 1,
+            notes: item.notes || null,
+          })),
+        };
+      }
+    }
+
+    const updated = await prisma.quoteRequest.update({
+      where: { id },
+      data: updateData,
       include: { quoteItems: { include: { product: true } } },
     });
     return NextResponse.json(updated);
@@ -409,17 +435,31 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const idParam = searchParams.get('id');
-    const id = idParam ? Number(idParam) : undefined;
-    if (!id || Number.isNaN(id)) {
-      return NextResponse.json({ error: 'Missing or invalid id' }, { status: 400 });
+    const quoteRequestIdParam = searchParams.get('quoteRequestId');
+    const itemIdParam = searchParams.get('itemId');
+
+    const quoteRequestId = quoteRequestIdParam ? Number(quoteRequestIdParam) : undefined;
+    const itemId = itemIdParam ? Number(itemIdParam) : undefined;
+
+    if (quoteRequestId === undefined || Number.isNaN(quoteRequestId)) {
+      return NextResponse.json({ error: 'Missing or invalid quoteRequestId' }, { status: 400 });
     }
 
-    // Delete child items first (works regardless of FK cascade settings)
-    await prisma.quoteItem.deleteMany({ where: { quoteRequestId: id } });
-    await prisma.quoteRequest.delete({ where: { id } });
-    return NextResponse.json({ ok: true });
+    if (itemId !== undefined && !Number.isNaN(itemId)) {
+      // Delete a specific QuoteItem
+      await prisma.quoteItem.delete({
+        where: { id: itemId, quoteRequestId: quoteRequestId },
+      });
+      return NextResponse.json({ ok: true, message: 'Quote item deleted successfully.' });
+    } else {
+      // Delete the entire QuoteRequest (and its items due to cascade delete)
+      await prisma.quoteRequest.delete({
+        where: { id: quoteRequestId },
+      });
+      return NextResponse.json({ ok: true, message: 'Quote request and its items deleted successfully.' });
+    }
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete quote request' }, { status: 500 });
+    console.error("Error deleting quote item or request:", error);
+    return NextResponse.json({ error: 'Failed to delete quote item or request' }, { status: 500 });
   }
 } 
