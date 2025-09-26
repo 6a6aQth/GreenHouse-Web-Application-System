@@ -8,7 +8,7 @@ import { useQuote } from "../context/QuoteContext";
 import { useRouter } from "next/navigation";
 
 export default function BookingForm({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
-  const { items, clearQuote } = useQuote();
+  const { items, clearQuote, currentQuoteRequestId, setCurrentQuoteRequestId } = useQuote();
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,19 +34,44 @@ export default function BookingForm({ open, setOpen }: { open: boolean; setOpen:
       setLoading(false);
       return;
     }
-    const payload = {
+
+    let apiMethod = "POST";
+    let apiUrl = "/api/quote-request";
+    let payload: any = {
       userName: form.name,
       userEmail: form.email,
       userPhone: form.phone,
-      items: items.map((item) => ({
-        productId: item.id,
-        quantity: 1,
-        notes: form.notes || null,
-      })),
+      notes: form.notes || null, // Add notes to the main quote request
     };
+
+    if (currentQuoteRequestId) {
+      apiMethod = "PATCH";
+      payload.id = currentQuoteRequestId;
+      // For PATCH, we need to explicitly send user details to update the existing quote request
+      payload.userName = form.name;
+      payload.userEmail = form.email;
+      payload.userPhone = form.phone;
+      payload.notes = form.notes || null;
+      
+      // For PATCH, we need to send items with their dbId (if available) for updates, or productId for new creations
+      payload.items = items.map(item => ({
+        id: item.dbId, // Use dbId for existing items
+        productId: item.id, // Use productId for new items (if dbId is undefined)
+        quantity: item.quantity,
+        notes: form.notes || null, // Item-specific notes can be added here if needed
+      }));
+    } else {
+      // For POST, we send all items to be created with the new quote request
+      payload.items = items.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        notes: form.notes || null, // Item-specific notes can be added here if needed
+      }));
+    }
+
     try {
-      const res = await fetch("/api/quote-request", {
-        method: "POST",
+      const res = await fetch(apiUrl, {
+        method: apiMethod,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -54,6 +79,11 @@ export default function BookingForm({ open, setOpen }: { open: boolean; setOpen:
         clearQuote();
         setOpen(false);
         router.push("/?quote=success");
+        // If a new quote was created, update currentQuoteRequestId
+        if (apiMethod === "POST") {
+          const newQuoteRequest = await res.json();
+          setCurrentQuoteRequestId(newQuoteRequest.id);
+        }
       } else {
         const data = await res.json();
         setError(data.error || "Failed to submit request.");

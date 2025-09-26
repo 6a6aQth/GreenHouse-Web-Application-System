@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import BookingForm from "./BookingForm";
 
 export default function QuoteSummary() {
-  const { items, removeFromQuote, clearQuote } = useQuote()
+  const { items, removeFromQuote, clearQuote, updateQuoteItemQuantity } = useQuote()
   const [open, setOpen] = useState(false)
   const [showForm, setShowForm] = useState(false);
   const router = useRouter();
@@ -56,6 +56,13 @@ export default function QuoteSummary() {
                   <div>
                     <p className="font-medium">{it.name}</p>
                     <p className="text-xs text-slate-500">{it.category}</p>
+                    <input
+                      type="number"
+                      min="1"
+                      value={it.quantity.toString()}
+                      onChange={(e) => updateQuoteItemQuantity(it.id, parseInt(e.target.value))}
+                      className="w-16 text-center border rounded-md"
+                    />
                   </div>
                   <button className="text-slate-400 hover:text-red-500" onClick={() => removeFromQuote(it.id)}>
                     <X size={16} />
