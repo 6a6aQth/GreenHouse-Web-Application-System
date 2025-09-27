@@ -73,15 +73,37 @@ export default function AdminPage() {
     if (authenticated) {
       setLoading(true)
       fetch("/api/quote-request")
-        .then((res) => res.json())
-        .then((data) => setRfqs(data))
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`)
+          }
+          return res.json()
+        })
+        .then((data) => {
+          setRfqs(Array.isArray(data) ? data : [])
+        })
+        .catch((error) => {
+          console.error("Error fetching quote requests:", error)
+          setRfqs([])
+        })
         .finally(() => setLoading(false))
 
       // Load products
       setProductsLoading(true)
       fetch("/api/products")
-        .then((res) => res.json())
-        .then((data) => setProducts(data))
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`)
+          }
+          return res.json()
+        })
+        .then((data) => {
+          setProducts(Array.isArray(data) ? data : [])
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error)
+          setProducts([])
+        })
         .finally(() => setProductsLoading(false))
     }
   }, [authenticated])
@@ -252,7 +274,7 @@ export default function AdminPage() {
   }
 
   // Filtering
-  const filteredRfqs = rfqs.filter((rfq) => {
+  const filteredRfqs = (Array.isArray(rfqs) ? rfqs : []).filter((rfq) => {
     const statusOk = selectedStatuses.length === 0 || selectedStatuses.includes(rfq.status)
     const q = searchQuery.trim().toLowerCase()
     if (!q) return statusOk
@@ -332,7 +354,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50">
       <div className="max-w-7xl mx-auto px-4 py-6 md:p-8">
-        <div className="bg-white rounded-3xl shadow-xl p-4 md:p-8 mb-8 border border-green-100">
+        <div className="bg-white rounded-3xl shadow-xl p-3 md:p-8 mb-6 md:mb-8 border border-green-100 max-w-4xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <Image
@@ -351,15 +373,15 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-4 text-white text-center min-w-[100px]">
-                <BarChart3 className="w-6 h-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{products.length}</div>
+            <div className="grid grid-cols-2 gap-2 md:flex md:gap-4">
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-2 md:p-4 text-white text-center">
+                <BarChart3 className="w-4 h-4 md:w-6 md:h-6 mx-auto mb-1" />
+                <div className="text-lg md:text-2xl font-bold">{(Array.isArray(products) ? products : []).length}</div>
                 <div className="text-xs opacity-90">Products</div>
               </div>
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-4 text-white text-center min-w-[100px]">
-                <Users className="w-6 h-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{rfqs.length}</div>
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-2 md:p-4 text-white text-center">
+                <Users className="w-4 h-4 md:w-6 md:h-6 mx-auto mb-1" />
+                <div className="text-lg md:text-2xl font-bold">{(Array.isArray(rfqs) ? rfqs : []).length}</div>
                 <div className="text-xs opacity-90">Quotes</div>
               </div>
             </div>
@@ -369,7 +391,7 @@ export default function AdminPage() {
 
 
         {/* Quote Requests Section */}
-        <div className="bg-white rounded-3xl shadow-xl p-4 md:p-8 border border-green-100">
+        <div className="bg-white rounded-3xl shadow-xl p-3 md:p-8 border border-green-100 max-w-4xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -423,7 +445,7 @@ export default function AdminPage() {
               <div className="w-12 h-12 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin mx-auto mb-6"></div>
               <p className="text-gray-500 text-lg">Loading quote requests...</p>
             </div>
-          ) : rfqs.length === 0 ? (
+          ) : (Array.isArray(rfqs) ? rfqs : []).length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50">
               <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users className="w-10 h-10 text-gray-400" />
@@ -436,10 +458,10 @@ export default function AdminPage() {
               {filteredRfqs.map((rfq) => (
                 <div
                   key={rfq.id}
-                  className="bg-gradient-to-br from-gray-50 to-green-50 rounded-2xl p-8 border-2 border-green-100 shadow-lg"
+                  className="bg-gradient-to-br from-gray-50 to-green-50 rounded-2xl p-4 md:p-8 border-2 border-green-100 shadow-lg"
                 >
                   {/* RFQ Header */}
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6 relative">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6 mb-4 md:mb-6 relative">
                     <div className="space-y-3">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -520,42 +542,37 @@ export default function AdminPage() {
                   </div>
 
                   {/* Quote Items */}
-                  <div className="mb-6">
+                  <div className="mb-4 md:mb-6">
                     <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
                       <Package className="w-5 h-5 text-green-600" />
                       Requested Items
                     </h4>
                     <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-sm">
-                      <div className="bg-gradient-to-r from-gray-50 to-green-50 px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-gray-200">
-                        <div className="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                          <div className="col-span-4">Product</div>
-                          <div className="col-span-2">Category</div>
-                          <div className="col-span-2">Quantity</div>
-                          <div className="col-span-2">Admin Price</div>
-                          <div className="col-span-2">Notes</div>
+                      <div className="bg-gradient-to-r from-gray-50 to-green-50 px-3 md:px-6 py-3 md:py-4 border-b-2 border-gray-200">
+                        <div className="hidden md:grid grid-cols-4 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
+                          <div className="col-span-2">Product</div>
+                          <div className="col-span-1">Quantity</div>
+                          <div className="col-span-1">Price</div>
                         </div>
                       </div>
                       <div className="divide-y-2 divide-gray-100">
                         {rfq.quoteItems.map((item: any, idx: number) => (
-                          <div key={item.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors">
-                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center">
-                              <div className="sm:col-span-4">
-                                <span className="font-semibold text-gray-900">
+                          <div key={item.id} className="px-3 md:px-6 py-3 md:py-4 hover:bg-gray-50 transition-colors">
+                            <div className="space-y-3 md:grid md:grid-cols-4 md:gap-4 md:space-y-0 md:items-center">
+                              <div className="md:col-span-2">
+                                <div className="font-semibold text-gray-900 text-sm md:text-base truncate">
                                   {item.product?.name || "Unknown Product"}
-                                </span>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Category: <span className="font-medium capitalize">{item.product?.category}</span>
+                                </div>
                               </div>
-                              <div className="sm:col-span-2">
-                                <span className="text-xs text-gray-500 sm:hidden">Category</span>
-                                <span className="block text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-lg font-medium w-max">
-                                  [{item.product?.category}]
-                                </span>
+                              <div className="md:col-span-1">
+                                <div className="text-xs text-gray-500 md:hidden">Quantity</div>
+                                <div className="text-sm text-gray-900 font-semibold">Qty: {item.quantity}</div>
                               </div>
-                              <div className="sm:col-span-2">
-                                <span className="text-xs text-gray-500 sm:hidden">Quantity</span>
-                                <span className="block text-sm text-gray-900 font-semibold">Qty: {item.quantity}</span>
-                              </div>
-                              <div className="sm:col-span-2">
-                                <span className="text-xs text-gray-500 sm:hidden">Admin Price</span>
+                              <div className="md:col-span-1">
+                                <div className="text-xs text-gray-500 md:hidden">Admin Price</div>
                                 {editRfqId === rfq.id ? (
                                   <Input
                                     type="number"
@@ -564,11 +581,11 @@ export default function AdminPage() {
                                     placeholder="Set price"
                                     value={(editItems.find((e: any) => e.id === item.id)?.adminPrice as any) ?? ""}
                                     onChange={(e) => handleItemChange(idx, "adminPrice", e.target.value)}
-                                    className="w-full sm:w-28 border-2 border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm rounded-lg"
+                                    className="w-full border-2 border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm rounded-lg"
                                   />
                                 ) : (
                                   typeof item.adminPrice !== "undefined" ? (
-                                    <span className="block text-sm font-bold text-green-700 bg-green-100 px-2 py-1 rounded-lg w-max">
+                                    <span className="block text-sm font-bold text-green-700 bg-green-100 px-2 py-1 rounded-lg">
                                       {formatKwacha(Number(item.adminPrice))}
                                     </span>
                                   ) : (
@@ -576,20 +593,18 @@ export default function AdminPage() {
                                   )
                                 )}
                               </div>
-                              <div className="sm:col-span-2">
-                                <span className="text-xs text-gray-500 sm:hidden">Notes</span>
-                                {item.notes ? (
-                                  <span className="block text-sm text-gray-600">{item.notes}</span>
-                                ) : (
-                                  <span className="block text-sm text-gray-400 italic">No notes</span>
-                                )}
-                              </div>
+                              {item.notes && (
+                                <div className="md:col-span-4 mt-2 md:mt-0">
+                                  <div className="text-xs text-gray-500">Notes:</div>
+                                  <div className="text-sm text-gray-600">{item.notes}</div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
                       </div>
                       {/* Subtotal and edit toolbar */}
-                      <div className="flex justify-end px-4 sm:px-6 py-4 border-t-2 border-gray-100 bg-gray-50">
+                      <div className="flex justify-end px-3 md:px-6 py-3 md:py-4 border-t-2 border-gray-100 bg-gray-50">
                         {(() => {
                           const subtotal = rfq.quoteItems.reduce((sum: number, it: any) => {
                             const price = Number(it.adminPrice || 0)
@@ -597,22 +612,22 @@ export default function AdminPage() {
                             return sum + price * qty
                           }, 0)
                           return (
-                            <div className="w-full flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="w-full flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                               <div className="text-sm font-semibold text-gray-800">
                                 Subtotal: <span className="text-green-700">{formatKwacha(subtotal)}</span>
                               </div>
                               {editRfqId === rfq.id && (
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                                   <label className="flex items-center gap-2 text-sm text-gray-700">
                                     <Switch checked={markAsQuoted} onCheckedChange={setMarkAsQuoted} />
                                     Mark as Quoted
                                   </label>
-                                  <div className="flex gap-3">
-                                    <Button onClick={saveEdit} disabled={saving} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 shadow">
+                                  <div className="flex flex-col sm:flex-row gap-2">
+                                    <Button onClick={saveEdit} disabled={saving} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-3 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 shadow text-sm">
                                       <Save className="w-4 h-4" />
                                       {saving ? "Saving..." : "Save"}
                                     </Button>
-                                    <Button variant="outline" onClick={cancelEdit} className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-semibold transition-all duration-200 bg-transparent">
+                                    <Button variant="outline" onClick={cancelEdit} className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg font-semibold transition-all duration-200 bg-transparent text-sm">
                                       Cancel
                                     </Button>
                                   </div>
@@ -626,7 +641,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* Admin Notes */}
-                  <div className="mb-6 p-4 md:p-6 bg-white rounded-xl border-2 border-gray-200">
+                  <div className="mb-4 md:mb-6 p-3 md:p-6 bg-white rounded-xl border-2 border-gray-200">
                     <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-lg">
                       <FileText className="w-5 h-5" />
                       Admin Notes
@@ -669,7 +684,7 @@ export default function AdminPage() {
         </div>
 
         {/* Products Management Section */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 mt-8 border border-green-100">
+        <div className="bg-white rounded-3xl shadow-xl p-3 md:p-8 mt-6 md:mt-8 border border-green-100 max-w-4xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
               <Leaf className="w-7 h-7 text-white" />
@@ -784,7 +799,7 @@ export default function AdminPage() {
                   <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                     <Package className="w-5 h-5 text-white" />
                   </div>
-                  Existing Products ({products.length})
+                  Existing Products ({(Array.isArray(products) ? products : []).length})
                 </h3>
                 {productsLoading && (
                   <div className="text-sm text-gray-500 flex items-center gap-2">
@@ -795,8 +810,8 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              {products.length === 0 ? (
+            <div>
+              {(Array.isArray(products) ? products : []).length === 0 ? (
                 <div className="p-12 text-center text-gray-500">
                   <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Package className="w-10 h-10 text-gray-400" />
@@ -806,30 +821,30 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div className="divide-y-2 divide-gray-100">
-                  {products.map((p, index) => (
-                    <div key={p.id} className={`p-8 ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}>
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
-                            <Home className="w-8 h-8 text-white" />
+                  {(Array.isArray(products) ? products : []).map((p, index) => (
+                    <div key={p.id} className={`p-4 md:p-8 ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-8 gap-4">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                            <Home className="w-6 h-6 md:w-8 md:h-8 text-white" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-gray-900 text-2xl">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-bold text-gray-900 text-lg md:text-xl truncate">
                               {editingProductId === p.id ? (
                                 <Input
                                   value={productDraft.name}
                                   onChange={(e) => setProductDraft({ ...productDraft, name: e.target.value })}
-                                  className="w-full max-w-sm"
+                                  className="w-full"
                                 />
                               ) : (
                                 p.name || "Unnamed Product"
                               )}
                             </h4>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-xs md:text-sm text-gray-500 mt-1 truncate">
                               ID: <span className="font-medium">{p.id}</span> • Category:{" "}
                               {editingProductId === p.id ? (
                                 <select
-                                  className="ml-1 border-2 border-gray-200 rounded-xl px-3 py-1 text-sm bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 capitalize"
+                                  className="ml-1 border-2 border-gray-200 rounded-xl px-2 py-1 text-xs bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 capitalize"
                                   value={productDraft.category}
                                   onChange={(e) => setProductDraft({ ...productDraft, category: e.target.value })}
                                 >
@@ -878,9 +893,9 @@ export default function AdminPage() {
                       </div>
 
                       {/* Product Details Grid */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
                         {/* Basic Info Column */}
-                        <div className="space-y-6">
+                        <div className="space-y-4 md:space-y-6">
                           <div>
                             <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                               <Type className="w-4 h-4 text-green-500" />
@@ -922,7 +937,7 @@ export default function AdminPage() {
                         </div>
 
                         {/* Tags Column */}
-                        <div className="space-y-6">
+                        <div className="space-y-4 md:space-y-6">
                           <div>
                             <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                               <Tag className="w-4 h-4 text-green-500" />
@@ -958,7 +973,7 @@ export default function AdminPage() {
                         </div>
 
                         {/* Description Column - Full Width */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-2 space-y-4 md:space-y-6">
                           <div>
                             <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                               <FileText className="w-4 h-4 text-green-500" />
