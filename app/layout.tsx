@@ -3,7 +3,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Smart Agri Solutions',
-  description: 'Created with v0',
+  description: 'Created by MidasCreed',
   generator: 'v0.dev',
 }
 
