@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useQuote } from "../context/QuoteContext";
+import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 export default function BookingForm({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
@@ -78,7 +79,11 @@ export default function BookingForm({ open, setOpen }: { open: boolean; setOpen:
       if (res.ok) {
         clearQuote();
         setOpen(false);
-        router.push("/?quote=success");
+        toast({
+          title: "Request submitted",
+          description: "Thank you! We\'ll contact you shortly.",
+        });
+        router.push("/");
         // If a new quote was created, update currentQuoteRequestId
         if (apiMethod === "POST") {
           const newQuoteRequest = await res.json();
