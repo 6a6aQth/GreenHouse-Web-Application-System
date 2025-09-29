@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
   title: 'Smart Agri Solutions',
@@ -17,7 +18,10 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/Logo2.png" type="image/png" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   )
 }
