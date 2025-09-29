@@ -772,11 +772,11 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8">
               <Button
                 onClick={createProduct}
                 disabled={creating}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+                className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 md:px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 {creating ? "Creating..." : "Add Product"}
@@ -784,7 +784,7 @@ export default function AdminPage() {
               <Button
                 variant="outline"
                 onClick={resetNewProduct}
-                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 rounded-xl font-semibold transition-all duration-200 bg-transparent"
+                className="w-full sm:w-auto border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-6 md:px-8 py-3 rounded-xl font-semibold transition-all duration-200 bg-transparent"
               >
                 Reset Form
               </Button>
@@ -823,7 +823,7 @@ export default function AdminPage() {
                 <div className="divide-y-2 divide-gray-100">
                   {(Array.isArray(products) ? products : []).map((p, index) => (
                     <div key={p.id} className={`p-4 md:p-8 ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-8 gap-4">
+                      <div className="flex items-start sm:items-center justify-between gap-3 mb-4 md:mb-8">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
                             <Home className="w-6 h-6 md:w-8 md:h-8 text-white" />
@@ -858,7 +858,7 @@ export default function AdminPage() {
                             </p>
                           </div>
                         </div>
-                        <div className="relative group">
+                        <div className="relative group flex-shrink-0 self-start sm:self-auto">
                           <button className="p-2 rounded-full hover:bg-gray-100" aria-haspopup="menu" aria-expanded="false">
                             <span className="sr-only">Open menu</span>
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="text-gray-600"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg>
